@@ -12,12 +12,18 @@
 @interface FPCheckrController : NSObject <GrowlApplicationBridgeDelegate> {
     IBOutlet NSTextField *_statusText;
     IBOutlet NSButton *_monitorButton;
+    IBOutlet NSButton *_growlButton;
+    IBOutlet NSButton *_logButton;
     
     NSTimer *_checkFrontProcessTimer;
     BOOL _monitoring;
+    BOOL _growling;
+    BOOL _logging;
     ProcessSerialNumber _lastFrontProcess;
 }
 
 - (IBAction) toggleMonitoring:(id)sender;
+- (IBAction) toggleGrowl:(id)sender;
+- (IBAction) toggleLog:(id)sender;
 
 @end
