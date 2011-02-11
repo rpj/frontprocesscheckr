@@ -8,6 +8,11 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Growl-WithInstaller/GrowlApplicationBridge.h>
+#import "FPCheckrEventController.h"
+
+#define kIdleTimeoutInSeconds   10
+#define kIdleEventMarker        (time_t)0
+#define kMenuBarIconSizeTweak   43
 
 @interface FPCheckrController : NSObject <GrowlApplicationBridgeDelegate> {
     IBOutlet NSTextField *_statusText;
@@ -18,6 +23,7 @@
     IBOutlet NSMenuItem *_monitorMI;
     IBOutlet NSMenuItem *_growlMI;
     IBOutlet NSMenuItem *_logMI;
+    NSStatusItem *_menuBarItem;
     
     NSTimer *_checkFrontProcessTimer;
     BOOL _monitoring;
@@ -25,7 +31,9 @@
     BOOL _logging;
     ProcessSerialNumber _lastFrontProcess;
     
-    NSStatusItem *_menuBarItem;
+    
+    FPCheckrEventController* _events;
+    time_t _lastEvent;
 }
 
 - (IBAction) toggleMonitoring:(id)sender;

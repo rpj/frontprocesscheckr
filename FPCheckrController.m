@@ -71,6 +71,44 @@
     return icon;
 }
 
+- (NSString*) _lastFrontProcessName
+{
+    NSString* processName = NULL;
+    
+    if (_lastFrontProcess.highLongOfPSN || _lastFrontProcess.lowLongOfPSN) {
+        CopyProcessName(&_lastFrontProcess, (CFStringRef*)&processName);
+        [processName autorelease];
+    }
+    
+    return processName;
+}
+
+- (void) _swapMenuBarImages;
+{
+    NSImage* swap = [_menuBarItem image];
+    [_menuBarItem setImage:[_menuBarItem alternateImage]];
+    [_menuBarItem setAlternateImage:swap];
+}
+
+- (void) _updateMenuBarTooltip;
+{
+    [_menuBarItem setToolTip:[NSString stringWithFormat:@"Monitor %@ | Growl %@ | Log %@",
+                              _monitoring ? @"ON" : @"OFF", 
+                              _growling ? @"ON" : @"OFF", 
+                              _logging ? @"ON" : @"OFF"]];
+}
+
+- (void) _checkIdleState
+{
+    if (time(NULL) - _lastEvent >= kIdleTimeoutInSeconds) {
+        if (_lastEvent) {
+            [self _log:[self _lastFrontProcessName] event:@"Idle"];
+            [self _swapMenuBarImages];
+            _lastEvent = kIdleEventMarker;
+        }
+    }
+}
+
 - (void) _checkFrontProcess
 {
     ProcessSerialNumber frontProcess;
@@ -86,6 +124,8 @@
         [self _displayProcessChangedNotification:(NSString *)processName iconData:[self _iconForProcess:&frontProcess]];
         if (processName) CFRelease(processName);
     }
+    
+    [self _checkIdleState];
 }
  
 - (void) _disableTimer
@@ -103,10 +143,21 @@
     }
 }
 
+- (void) _event:(id)infoObj;
+{
+    if (_lastEvent == kIdleEventMarker) {
+        [self _log:[self _lastFrontProcessName] event:@"Active"];
+        [self _swapMenuBarImages];
+    }
+    
+    (void)time(&_lastEvent);
+}
+
 - (id) init
 {
     if ((self = [super init])) {
         _monitoring = NO;
+        (void)time(&_lastEvent);
     }
     return self;
 }
@@ -114,6 +165,8 @@
 - (void) dealloc
 {
     [_menuBarItem release];
+    [_events release];
+    
     [self _disableTimer];
     [super dealloc];
 }
@@ -121,6 +174,9 @@
 - (void) awakeFromNib
 {
     [GrowlApplicationBridge setGrowlDelegate:self];
+    
+    _events = [[FPCheckrEventController alloc] initWithTarget:self andSelector:@selector(_event:)];
+    [_events installEventHandlers];
     
     NSUserDefaults* sud = [NSUserDefaults standardUserDefaults];
     id curBool = nil;
@@ -139,8 +195,8 @@
     NSImage* icon = [NSImage imageNamed:@"mbIcon.png"];
     NSImage* hiIcon = [NSImage imageNamed:@"mbIcon-uf.png"];
     NSSize imgSize = [icon size];
-    imgSize.height -= 42;
-    imgSize.width -= 42;
+    imgSize.height -= kMenuBarIconSizeTweak;
+    imgSize.width -= kMenuBarIconSizeTweak;
     [icon setSize:imgSize];
     [hiIcon setSize:imgSize];
     
@@ -148,9 +204,8 @@
     [_menuBarItem setImage:icon];
     [_menuBarItem setAlternateImage:hiIcon];
     [_menuBarItem setHighlightMode:YES];
-    [_menuBarItem setToolTip:[NSString stringWithFormat:@"Growl %@ / Log %@",
-                              _growling ? @"ON" : @"OFF", _logging ? @"ON" : @"OFF"]];
     [_menuBarItem setMenu:_menuBarMenu];
+    [self _updateMenuBarTooltip];
 }
 
 - (NSApplicationTerminateReply) applicationShouldTerminate:(NSApplication *)sender
@@ -177,6 +232,8 @@
     
     if ([sender isKindOfClass:[NSMenuItem class]])
         [(NSMenuItem*)sender setState:_monitoring ? NSOnState : NSOffState];
+    
+    [self _updateMenuBarTooltip];
 }
 
 - (void) _toggleElement:(NSButton*)button menuItem:(NSMenuItem*)mItem withFlag:(BOOL*)flag andTitle:(NSString*)title;
@@ -185,6 +242,7 @@
     button.state = mItem.state = *flag ? NSOnState : NSOffState;
     button.title = [NSString stringWithFormat:@"%@ %@", title, *flag ? @"ON" : @"OFF"];
     [[NSUserDefaults standardUserDefaults] setBool:*flag forKey:title];
+    [self _updateMenuBarTooltip];
 }
 
 - (IBAction) toggleGrowl:(id)sender

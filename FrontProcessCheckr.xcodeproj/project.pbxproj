@@ -15,6 +15,8 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		9419CF411305F3B600508195 /* FPCheckrEventController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9419CF401305F3B600508195 /* FPCheckrEventController.m */; };
+		9419CF4B1305F54C00508195 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9419CF4A1305F54C00508195 /* Carbon.framework */; };
 		94A0C1051305CF1500B02D95 /* mbIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 94A0C1041305CF1500B02D95 /* mbIcon.png */; };
 		94A0C1171305CFB300B02D95 /* mbIcon-uf.png in Resources */ = {isa = PBXBuildFile; fileRef = 94A0C1161305CFB300B02D95 /* mbIcon-uf.png */; };
 /* End PBXBuildFile section */
@@ -48,6 +50,9 @@
 		431543C60D78CCD400C9A69E /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* FrontProcessCheckr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FrontProcessCheckr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9419CF3F1305F3B600508195 /* FPCheckrEventController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FPCheckrEventController.h; sourceTree = "<group>"; };
+		9419CF401305F3B600508195 /* FPCheckrEventController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FPCheckrEventController.m; sourceTree = "<group>"; };
+		9419CF4A1305F54C00508195 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		94A0C1041305CF1500B02D95 /* mbIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = mbIcon.png; path = Resources/mbIcon.png; sourceTree = "<group>"; };
 		94A0C1161305CFB300B02D95 /* mbIcon-uf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "mbIcon-uf.png"; path = "Resources/mbIcon-uf.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -57,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9419CF4B1305F54C00508195 /* Carbon.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				431543710D78C8D000C9A69E /* Growl-WithInstaller.framework in Frameworks */,
 			);
@@ -70,6 +76,8 @@
 			children = (
 				431542FB0D78BDF000C9A69E /* FPCheckrController.h */,
 				431542FC0D78BDF000C9A69E /* FPCheckrController.m */,
+				9419CF3F1305F3B600508195 /* FPCheckrEventController.h */,
+				9419CF401305F3B600508195 /* FPCheckrEventController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -85,6 +93,7 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9419CF4A1305F54C00508195 /* Carbon.framework */,
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
 				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
@@ -212,6 +221,7 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				431542FD0D78BDF000C9A69E /* FPCheckrController.m in Sources */,
+				9419CF411305F3B600508195 /* FPCheckrEventController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
