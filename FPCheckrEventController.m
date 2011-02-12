@@ -32,7 +32,7 @@ static OSStatus fpcEventHandler(EventHandlerCallRef inHandlerRef, EventRef event
     if (!_eventTarget || ![_eventTarget respondsToSelector:_eventSel])
         return NO;
     
-    EventTypeSpec eventTypes[2];
+    EventTypeSpec eventTypes[4];
     
     eventTypes[0].eventClass = kEventClassKeyboard;
     eventTypes[0].eventKind = kEventRawKeyDown;
@@ -40,8 +40,14 @@ static OSStatus fpcEventHandler(EventHandlerCallRef inHandlerRef, EventRef event
     eventTypes[1].eventClass = kEventClassMouse;
     eventTypes[1].eventKind = kEventMouseMoved;
     
+    eventTypes[2].eventClass = kEventClassMouse;
+    eventTypes[2].eventKind = kEventMouseWheelMoved;
+    
+    eventTypes[3].eventClass = kEventClassMouse;
+    eventTypes[3].eventKind = kEventMouseScroll;
+    
     EventHandlerUPP handlerUPP = NewEventHandlerUPP(fpcEventHandler);
-    OSStatus err = InstallEventHandler(GetEventMonitorTarget(), handlerUPP, 2, eventTypes, self, NULL);
+    OSStatus err = InstallEventHandler(GetEventMonitorTarget(), handlerUPP, 4, eventTypes, self, NULL);
     
     return (err == noErr);
 }

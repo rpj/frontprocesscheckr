@@ -10,7 +10,7 @@
 #import <Growl-WithInstaller/GrowlApplicationBridge.h>
 #import "FPCheckrEventController.h"
 
-#define kIdleTimeoutInSeconds   10
+#define kIdleTimeoutInSeconds   30
 #define kIdleEventMarker        (time_t)0
 #define kMenuBarIconSizeTweak   43
 
