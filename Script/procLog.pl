@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use Getopt::Std;
+use URI::Escape;
 
 sub usage { 
 	print "Usage: $0 -f [options]\n\n"; 
@@ -11,6 +12,7 @@ sub usage {
 	print "\t-i\t\tInclude idle time directly into metric.\n";
 	print "\t-n\t\tInclude idle time metric separately (overrides -i).\n";
 	print "\t-c\t\tGenerate a Google Chart of the results.\n";
+	print "\t-C\t\tChart-only: print the chart URL and exit immediately.\n";
 	print "\n";
 	exit(0); 
 }
@@ -25,7 +27,7 @@ sub formatSeconds($) {
 	sprintf("%02d:%02d:%02d (%d secs)", $mhrs, $mmins, $secs % 60, $secs);
 }
 
-getopts("f:s:p:hdinc");
+getopts("f:s:p:hdincC");
 
 usage(), if ($opt_h || !defined($opt_f));
 my $metricName = $opt_s || 'time';
@@ -66,8 +68,10 @@ while (<F>) { chomp;
 }
 
 my $lastFreq = 1;
-print sprintf("% 40s | %s\n", "App Name", "Metric" . ($opt_i ? ", including idle" : ($opt_n ? " [idle]" : "")));
-print sprintf("%s-|-%s\n", '-' x 40, '-' x 40);
+unless ($opt_c && $opt_C) {
+	print sprintf("% 40s | %s\n", "App Name", "Metric" . ($opt_i ? ", including idle" : ($opt_n ? " [idle]" : "")));
+	print sprintf("%s-|-%s\n", '-' x 40, '-' x 40);
+}
 
 my $totalMetric = 0;
 foreach (sort { $stats->{$b}->{$metricName} <=> $stats->{$a}->{$metricName} } keys %$stats) {
@@ -75,11 +79,11 @@ foreach (sort { $stats->{$b}->{$metricName} <=> $stats->{$a}->{$metricName} } ke
 	$totalMetric += $m;
 	my $idleMetric = '';
 	$idleMetric = $stats->{$_}->{idle}->{$metricName}, if ($opt_n);
-	
+
 	$m = formatSeconds($m), if ($metricName eq 'time');
 	$idleMetric = formatSeconds($idleMetric), if ($opt_n && $metricName eq 'time');
-	print sprintf("% 40s | %s%s\n", $_, $m, ($opt_n ? " [$idleMetric]" : "")); 
-	
+	print sprintf("% 40s | %s%s\n", $_, $m, ($opt_n ? " [$idleMetric]" : "")), unless ($opt_c && $opt_C); 
+
 	last, if ($opt_p && ($stats->{$_}->{$metricName} / $lastFreq) < $opt_p);
 	$lastFreq = $stats->{$_}->{$metricName};
 }
@@ -106,6 +110,8 @@ if ($opt_c) {
 	$gcqStr =~ s/,$//ig;
 	$lgnStr .= "Other";
 	
-	$gcqStr = "${gcqStr}&chs=500x500&chco=0000ee&chdl=${lgnStr}";
-	print "\n\nGo to this URL for chart:\n\t$gcqStr\n";
+	$title = uri_escape("Metric: ${metricName}" . ($opt_i ? " (idle included)" : ""));
+	$gcqStr = "${gcqStr}&chs=500x500&chco=0070ee&chf=bg,lg,90,E2E2E2,0,FFEAC0,1&chtt=${title}&chdl=${lgnStr}";
+	print "\n\nGo to this URL for chart:\n\t$gcqStr\n", if (!$opt_C);
+	print "$gcqStr", if ($opt_C);
 }
