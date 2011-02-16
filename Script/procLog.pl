@@ -2,6 +2,8 @@
 
 use Getopt::Std;
 use URI::Escape;
+use LWP::Simple;
+use Posix qw(INT_MAX);
 
 sub usage { 
 	print "Usage: $0 -f [options]\n\n"; 
@@ -12,7 +14,7 @@ sub usage {
 	print "\t-i\t\tInclude idle time directly into metric.\n";
 	print "\t-n\t\tInclude idle time metric separately (overrides -i).\n";
 	print "\t-c\t\tGenerate a Google Chart of the results.\n";
-	print "\t-C\t\tChart-only: print the chart URL and exit immediately.\n";
+	print "\t-C\t\tChart-only: print the chart URL (sans scheme+host) and exit immediately.\n";
 	print "\n";
 	exit(0); 
 }
@@ -94,7 +96,8 @@ if ($opt_c) {
 	my $bcount = 0;
 	my $btotal = 0;
 	
-	my $gcqStr = 'http://chart.googleapis.com/chart?cht=p&chd=t:';
+	my $gcqStr = '/chart?cht=p&chd=t:';
+	$gcqStr = 'http://chart.googleapis.com/chart?' . $gcqStr, unless ($opt_C);
 	my $lgnStr = '';
 	
 	foreach (sort { $stats->{$b}->{$metricName} <=> $stats->{$a}->{$metricName} } keys %$stats) {
@@ -110,8 +113,9 @@ if ($opt_c) {
 	$gcqStr =~ s/,$//ig;
 	$lgnStr .= "Other";
 	
-	$title = uri_escape("Metric: ${metricName}" . ($opt_i ? " (idle included)" : ""));
-	$gcqStr = "${gcqStr}&chs=500x500&chco=0070ee&chf=bg,lg,90,E2E2E2,0,FFEAC0,1&chtt=${title}&chdl=${lgnStr}";
+	$title = "Metric: ${metricName}" . ($opt_i ? " (idle included)" : "");
+	$title = uri_escape($title), unless ($opt_C);
+	$gcqStr = "${gcqStr}&chs=500x500&chco=0070ee&chf=bg,lg,90,E2E2E2,0,FFEAC0,1&chma=0,90&chtt=${title}&chdl=${lgnStr}";
 	print "\n\nGo to this URL for chart:\n\t$gcqStr\n", if (!$opt_C);
 	print "$gcqStr", if ($opt_C);
 }

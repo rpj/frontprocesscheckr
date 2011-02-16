@@ -8,6 +8,9 @@
 
 #import "FPCheckrController.h"
 
+#define LOG_FILE	([[NSString stringWithFormat:@"~/Library/Application Support/%@/log.csv", \
+					[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey]] stringByExpandingTildeInPath])
+
 @implementation FPCheckrController
 
 - (void) _log:(NSString*)frontProcessName event:(NSString*)event
@@ -253,5 +256,69 @@
 - (IBAction) toggleLog:(id)sender
 {
     [self _toggleElement:_logButton menuItem:_logMI withFlag:&_logging andTitle:@"Log"];
+	[_chartingMI setEnabled:[[NSFileManager defaultManager] fileExistsAtPath:LOG_FILE]];
 }
+
+- (IBAction) toggleMain:(id)sender;
+{
+	[_window makeKeyAndOrderFront:self];
+	[_window orderFrontRegardless];
+}
+
+- (IBAction) toggleCharting:(id)sender;
+{
+	[_chartWindow setIsVisible:YES];
+	[_chartWindow makeKeyAndOrderFront:self];
+	[_chartWindow orderFrontRegardless];
+}
+
+- (IBAction) generateChart:(id)sender;
+{
+	[_chartingSpinner setHidden:NO];
+	[_chartingSpinner startAnimation:self];
+	
+	NSString* script = [[NSBundle mainBundle] pathForResource:@"procLog" ofType:@"pl"];
+	
+	NSPipe* tStdOutPipe = [NSPipe pipe];
+	NSTask* task = [[NSTask alloc] init];
+	
+	NSMutableArray* targs = [NSMutableArray arrayWithObjects:@"-c", @"-C", @"-f", LOG_FILE, nil];
+	
+	if ([_chartIdleButton state] == NSOnState)
+		[targs addObject:@"-i"];
+	if ([_chartMetricSelect selectedSegment] == 1)
+		[targs addObjectsFromArray:[NSArray arrayWithObjects:@"-s", @"count", nil]];
+	
+	[task setArguments:targs];	
+	[task setLaunchPath:script];
+	[task setStandardOutput:tStdOutPipe];
+	[task launch];
+	
+	while ([task isRunning])
+		[NSThread sleepForTimeInterval:0.001];
+	
+	NSData* output = [[tStdOutPipe fileHandleForReading] availableData];
+	NSString* outputStr = [[NSString alloc] initWithData:output encoding:NSASCIIStringEncoding];
+	
+	NSURL* url = [[NSURL alloc] initWithScheme:@"http" host:@"chart.googleapis.com" path:outputStr];
+	NSURLRequest* imageReq = [NSURLRequest requestWithURL:url];
+	NSURLResponse* imageResp = nil;
+	NSError* err = nil;
+	NSData* imageData = [NSURLConnection sendSynchronousRequest:imageReq returningResponse:&imageResp error:&err];
+	
+	if (!err) {
+		NSImage* image = [[NSImage alloc] initWithData:imageData];
+		[_chartImage setImage:image];
+		[image release];
+	}
+	else
+		NSLog(@"Loading URL:\n%@\nfailed with error:\n%@\n", url, err);
+	
+	[[NSFileManager defaultManager] removeItemAtPath:outputStr error:nil];
+	[outputStr release];
+	
+	[_chartingSpinner setHidden:YES];
+	[_chartingSpinner stopAnimation:self];
+}
+						  
 @end
