@@ -45,6 +45,7 @@ open (F, "$opt_f") or die "Couldn't open '$opt_f': $!\n\n";
 while (<F>) { chomp;
 	my ($ts, $event, $name) = split(/,/);
 	print STDERR "$ts, $event, $name\n", if ($opt_d);
+	next, if ($ts eq 'Datestamp');	# skip header
 	
 	if (defined($lts) && defined($lname) && $lname !~ /(?:ScreenSaverEngine|loginwindow)/ig) {
 		my $tdelta = $ts - $lts;
