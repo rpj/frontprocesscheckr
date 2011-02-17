@@ -270,6 +270,9 @@
 	[_chartWindow setIsVisible:YES];
 	[_chartWindow makeKeyAndOrderFront:self];
 	[_chartWindow orderFrontRegardless];
+	
+	if (![_chartImage image])
+		[self generateChart:self];
 }
 
 - (IBAction) generateChart:(id)sender;
