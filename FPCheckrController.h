@@ -13,23 +13,23 @@
 #define kIdleTimeoutInSeconds   30
 #define kIdleEventMarker        (time_t)0
 #define kMenuBarIconSizeTweak   43
+#define kChartRefreshMult		15
 
 @interface FPCheckrController : NSObject <GrowlApplicationBridgeDelegate> {
 	IBOutlet NSWindow *_window;
+	IBOutlet NSTabView *_tabView;
     IBOutlet NSTextField *_statusText;
     IBOutlet NSButton *_monitorButton;
     IBOutlet NSButton *_growlButton;
     IBOutlet NSButton *_logButton;
     IBOutlet NSMenu *_menuBarMenu;
+    IBOutlet NSMenuItem *_mainWinMI;
     IBOutlet NSMenuItem *_monitorMI;
     IBOutlet NSMenuItem *_growlMI;
     IBOutlet NSMenuItem *_logMI;
-	IBOutlet NSWindow *_chartWindow;
-	IBOutlet NSImageView *_chartImage;
 	IBOutlet NSSegmentedControl *_chartMetricSelect;
 	IBOutlet NSButton *_chartIdleButton;
 	IBOutlet NSMenuItem *_chartingMI;
-	IBOutlet NSProgressIndicator *_chartingSpinner;
 	
     NSStatusItem *_menuBarItem;
     
@@ -39,16 +39,15 @@
     BOOL _logging;
     ProcessSerialNumber _lastFrontProcess;
     
-    
     FPCheckrEventController* _events;
     time_t _lastEvent;
 }
 
+- (IBAction) showPrefs:(id)sender;
 - (IBAction) toggleMonitoring:(id)sender;
 - (IBAction) toggleGrowl:(id)sender;
 - (IBAction) toggleLog:(id)sender;
 
-- (IBAction) toggleCharting:(id)sender;
-
+- (IBAction) chartClick:(id)sender;
 - (IBAction) generateChart:(id)sender;
 @end

@@ -15,6 +15,9 @@ sub usage {
 	print "\t-n\t\tInclude idle time metric separately (overrides -i).\n";
 	print "\t-c\t\tGenerate a Google Chart of the results.\n";
 	print "\t-C\t\tChart-only: print the chart URL (sans scheme+host) and exit immediately.\n";
+	print "\t-b [num]\tInclude 'num' data points in the generated chart (default: 8).\n";
+	print "\t-S [WxH]\tSet chart size to 'W'idth by 'H'eight. Must be in WxH format.\n";
+	print "\t-e [extra]\tAdd 'extra' to the Google Charts query string. Ref: code.google.com/apis/chart\n";
 	print "\n";
 	exit(0); 
 }
@@ -29,7 +32,7 @@ sub formatSeconds($) {
 	sprintf("%02d:%02d:%02d (%d secs)", $mhrs, $mmins, $secs % 60, $secs);
 }
 
-getopts("f:s:p:hdincC");
+getopts("f:s:p:hdincCb:S:e:");
 
 usage(), if ($opt_h || !defined($opt_f));
 my $metricName = $opt_s || 'time';
@@ -92,13 +95,15 @@ foreach (sort { $stats->{$b}->{$metricName} <=> $stats->{$a}->{$metricName} } ke
 }
 
 if ($opt_c) {
-	my $NUM_BUCKETS = 8;
+	my $NUM_BUCKETS = $opt_b || 8;
 	my @buckets;
 	my $bcount = 0;
 	my $btotal = 0;
 	
+	$opt_S = "250x175", unless(defined($opt_S));
+	
 	my $gcqStr = '/chart?cht=p&chd=t:';
-	$gcqStr = 'http://chart.googleapis.com/chart?' . $gcqStr, unless ($opt_C);
+	$gcqStr = 'http://chart.googleapis.com' . $gcqStr, unless ($opt_C);
 	my $lgnStr = '';
 	
 	foreach (sort { $stats->{$b}->{$metricName} <=> $stats->{$a}->{$metricName} } keys %$stats) {
@@ -116,7 +121,10 @@ if ($opt_c) {
 	
 	$title = "Metric: ${metricName}" . ($opt_i ? " (idle included)" : "");
 	$title = uri_escape($title), unless ($opt_C);
-	$gcqStr = "${gcqStr}&chs=500x500&chco=0070ee&chf=bg,lg,90,E2E2E2,0,FFEAC0,1&chma=0,90&chtt=${title}&chdl=${lgnStr}";
+	$gcqStr = "${gcqStr}&chs=${opt_S}&chco=FF0000,00efef,FFeF00&chdls=000000,10&chf=bg,s,00000000&chdlp=l&chdl=${lgnStr}";
+	$gcqStr = "${gcqStr}&chtt=${title}", unless ($opt_C);
+	$gcqStr = "${gcqStr}&${opt_e}", if (defined($opt_e));
+	
 	print "\n\nGo to this URL for chart:\n\t$gcqStr\n", if (!$opt_C);
 	print "$gcqStr", if ($opt_C);
 }
