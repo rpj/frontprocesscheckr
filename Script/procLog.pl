@@ -108,6 +108,7 @@ if ($opt_c) {
 	
 	foreach (sort { $stats->{$b}->{$metricName} <=> $stats->{$a}->{$metricName} } keys %$stats) {
 		$btotal += ($buckets[$bcount] = $stats->{$_}->{$metricName});
+        $_ =~ s/([^\(\)]+)(\s*\(.*\))/$1/ig;
 		$lgnStr .= "$_|";
 		last, if (++$bcount == $NUM_BUCKETS);
 	}
