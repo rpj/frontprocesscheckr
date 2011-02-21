@@ -15,6 +15,9 @@
     static NSArray* _apps = nil;
     static NSDate* _lastRefesh = nil;
     
+    // TODO: don't predicate a refresh based on a hardcoded timeout, but rather only if
+    // the front process has changed since the last time we were here
+    // Need to setup a notification for this
     if (!_apps || [[NSDate date] timeIntervalSinceDate:_lastRefesh] > 60.0) {
         [_apps release];
         [_lastRefesh release];

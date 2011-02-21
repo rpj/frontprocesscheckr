@@ -157,7 +157,10 @@ if ($opt_c) {
         }
     }
     else {
-        $colorGrad = "1188ff,11ff88";
+        # TODO: need to sort these by count, and not by name
+        # currently sorted by name, so charts come out sorted that way as well; this is confusing
+        # TODO: also need a better color gradient here
+        #$colorGrad = "1188ff,11ff88";
         printMetricHeader("Group Name", "\n");
         
         foreach my $gname (sort(keys(%$groups))) {

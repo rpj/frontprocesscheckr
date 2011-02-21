@@ -331,6 +331,7 @@
 		[sud setBool:([_chartIdleButton state] == NSOnState) forKey:@"ch.idle"];
 		[sud synchronize];
         
+        // TODO: the state of the _enableGroupsButton needs to be save to user defaults!
         NSDictionary* groups = (([_chartPanelCtlr hasAtleastOneGroup] && [_enableGroupsButton state]) == NSOnState ? 
                                 [_chartPanelCtlr groups] : nil);
         NSString* outputStr = [FPProcLogScriptProxy chartURLWithIdleFlag:([_chartIdleButton state] == NSOnState)
