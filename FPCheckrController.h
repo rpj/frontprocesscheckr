@@ -9,11 +9,18 @@
 #import <Cocoa/Cocoa.h>
 #import <Growl-WithInstaller/GrowlApplicationBridge.h>
 #import "FPCheckrEventController.h"
+#import "FPChartPanelController.h"
 
 #define kIdleTimeoutInSeconds   30
 #define kIdleEventMarker        (time_t)0
 #define kMenuBarIconSizeTweak   43
 #define kChartRefreshMult		15
+
+#define LOG_FILE	([[NSString stringWithFormat:@"~/Library/Application Support/%@/log.csv", \
+[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey]] stringByExpandingTildeInPath])
+
+#define CAN_CHART()	(_logging && [[NSFileManager defaultManager] fileExistsAtPath:LOG_FILE])
+
 
 @interface FPCheckrController : NSObject <GrowlApplicationBridgeDelegate> {
 	IBOutlet NSWindow *_window;
@@ -30,6 +37,9 @@
 	IBOutlet NSSegmentedControl *_chartMetricSelect;
 	IBOutlet NSButton *_chartIdleButton;
 	IBOutlet NSMenuItem *_chartingMI;
+    IBOutlet NSButton *_enableGroupsButton;
+    
+    IBOutlet FPChartPanelController* _chartPanelCtlr;
 	
     NSStatusItem *_menuBarItem;
     
@@ -49,5 +59,4 @@
 - (IBAction) toggleLog:(id)sender;
 
 - (IBAction) chartClick:(id)sender;
-- (IBAction) generateChart:(id)sender;
 @end

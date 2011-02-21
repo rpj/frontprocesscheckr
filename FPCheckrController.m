@@ -7,11 +7,7 @@
 //
 
 #import "FPCheckrController.h"
-
-#define LOG_FILE	([[NSString stringWithFormat:@"~/Library/Application Support/%@/log.csv", \
-					[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleNameKey]] stringByExpandingTildeInPath])
-
-#define CAN_CHART()	(_logging && [[NSFileManager defaultManager] fileExistsAtPath:LOG_FILE])
+#import "FPProcLogScriptProxy.h"
 
 @implementation FPCheckrController
 
@@ -183,8 +179,16 @@
 	[NSThread detachNewThreadSelector:@selector(generateChart:) toTarget:self withObject:self];
 }
 
+- (void)windowDidBecomeKey:(NSNotification*)notify;
+{
+    [_enableGroupsButton setEnabled:[_chartPanelCtlr hasAtleastOneGroup]];
+    [_enableGroupsButton setHidden:![_chartPanelCtlr hasAtleastOneGroup]];
+}
+
 - (void) awakeFromNib
 {
+    [[NSApplication sharedApplication] setDelegate:self];
+    [_chartPanelCtlr setAppDelegate:self];
     [GrowlApplicationBridge setGrowlDelegate:self];
     
     _events = [[FPCheckrEventController alloc] initWithTarget:self andSelector:@selector(_event:)];
@@ -225,7 +229,8 @@
     [self _updateMenuBarTooltip];
 	
 	[_menuBarMenu setDelegate:self];
-	[self generateChart:self];
+	[self menuWillOpen:_menuBarMenu];
+    [self windowDidBecomeKey:nil];
 }
 
 - (NSApplicationTerminateReply) applicationShouldTerminate:(NSApplication *)sender
@@ -285,7 +290,7 @@
 	else if (_logging)
 		[_chartingMI setTitle:@"Gathering samples..."];
 	else
-		[self generateChart:self];
+		[self menuWillOpen:_menuBarMenu];
 }
 
 - (void) showMain:(id)sender;
@@ -316,7 +321,7 @@
 		[self performSelector:@selector(setChart:) onThread:[NSThread mainThread] withObject:image waitUntilDone:YES];
 }
 
-- (IBAction) generateChart:(id)sender;
+- (void) generateChart:(id)sender;
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
@@ -325,29 +330,13 @@
 		[sud setInteger:[_chartMetricSelect selectedSegment] forKey:@"ch.metric"];
 		[sud setBool:([_chartIdleButton state] == NSOnState) forKey:@"ch.idle"];
 		[sud synchronize];
-		
-		NSString* script = [[NSBundle mainBundle] pathForResource:@"procLog" ofType:@"pl"];
-		
-		NSPipe* tStdOutPipe = [NSPipe pipe];
-		NSTask* task = [[NSTask alloc] init];
-		
-		NSMutableArray* targs = [NSMutableArray arrayWithObjects:@"-c", @"-C", @"-b", @"7", @"-f", LOG_FILE, nil];
-		
-		if ([_chartIdleButton state] == NSOnState)
-			[targs addObject:@"-i"];
-		if ([_chartMetricSelect selectedSegment] == 1)
-			[targs addObjectsFromArray:[NSArray arrayWithObjects:@"-s", @"count", nil]];
-		
-		[task setArguments:targs];	
-		[task setLaunchPath:script];
-		[task setStandardOutput:tStdOutPipe];
-		[task launch];
-		
-		while ([task isRunning])
-			[NSThread sleepForTimeInterval:0.001];
-		
-		NSData* output = [[tStdOutPipe fileHandleForReading] availableData];
-		NSString* outputStr = [[NSString alloc] initWithData:output encoding:NSASCIIStringEncoding];
+        
+        NSDictionary* groups = (([_chartPanelCtlr hasAtleastOneGroup] && [_enableGroupsButton state]) == NSOnState ? 
+                                [_chartPanelCtlr groups] : nil);
+        NSString* outputStr = [FPProcLogScriptProxy chartURLWithIdleFlag:([_chartIdleButton state] == NSOnState)
+                                                           metricIsCount:([_chartMetricSelect selectedSegment] == 1)
+                                                                  groups:groups];
+        
 		NSURL* url = nil;
 		
 		@try {
@@ -368,9 +357,6 @@
 		}
 		@catch (NSException *exception) {
 			NSLog(@"Bad news bears: %@", outputStr);
-		}
-		@finally {
-			[outputStr release];
 		}
 	}
 	

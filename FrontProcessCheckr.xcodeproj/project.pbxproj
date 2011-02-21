@@ -20,6 +20,8 @@
 		944AB918130C6D5B008DEE71 /* FPCheckrEventController.m in Sources */ = {isa = PBXBuildFile; fileRef = 944AB917130C6D5B008DEE71 /* FPCheckrEventController.m */; };
 		944AB91A130C6D77008DEE71 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 944AB919130C6D77008DEE71 /* Carbon.framework */; };
 		94723569130C67EE0053572C /* procLog.pl in Resources */ = {isa = PBXBuildFile; fileRef = 94723568130C67EE0053572C /* procLog.pl */; };
+		94D791A41311CD3B0038FF3F /* FPChartPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 94D791A31311CD3B0038FF3F /* FPChartPanelController.m */; };
+		94D791A71311D8780038FF3F /* FPProcLogScriptProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 94D791A61311D8780038FF3F /* FPProcLogScriptProxy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,6 +59,10 @@
 		944AB917130C6D5B008DEE71 /* FPCheckrEventController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FPCheckrEventController.m; sourceTree = "<group>"; };
 		944AB919130C6D77008DEE71 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = SDKs/MacOSX10.5.Internal.sdk/System/Library/Frameworks/Carbon.framework; sourceTree = DEVELOPER_DIR; };
 		94723568130C67EE0053572C /* procLog.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = procLog.pl; path = Script/procLog.pl; sourceTree = "<group>"; };
+		94D791A21311CD3B0038FF3F /* FPChartPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FPChartPanelController.h; sourceTree = "<group>"; };
+		94D791A31311CD3B0038FF3F /* FPChartPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FPChartPanelController.m; sourceTree = "<group>"; };
+		94D791A51311D8770038FF3F /* FPProcLogScriptProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FPProcLogScriptProxy.h; sourceTree = "<group>"; };
+		94D791A61311D8780038FF3F /* FPProcLogScriptProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FPProcLogScriptProxy.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +86,10 @@
 				944AB917130C6D5B008DEE71 /* FPCheckrEventController.m */,
 				431542FB0D78BDF000C9A69E /* FPCheckrController.h */,
 				431542FC0D78BDF000C9A69E /* FPCheckrController.m */,
+				94D791A21311CD3B0038FF3F /* FPChartPanelController.h */,
+				94D791A31311CD3B0038FF3F /* FPChartPanelController.m */,
+				94D791A51311D8770038FF3F /* FPProcLogScriptProxy.h */,
+				94D791A61311D8780038FF3F /* FPProcLogScriptProxy.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -234,6 +244,8 @@
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				431542FD0D78BDF000C9A69E /* FPCheckrController.m in Sources */,
 				944AB918130C6D5B008DEE71 /* FPCheckrEventController.m in Sources */,
+				94D791A41311CD3B0038FF3F /* FPChartPanelController.m in Sources */,
+				94D791A71311D8780038FF3F /* FPProcLogScriptProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
